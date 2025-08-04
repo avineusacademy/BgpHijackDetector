@@ -1,0 +1,43 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install build dependencies and tools
+RUN apt-get update && apt-get install -y \
+    gcc g++ make libtool autoconf automake pkg-config git \
+    libcurl4-openssl-dev libssl-dev zlib1g-dev \
+    python3-dev wget ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+    # Install librdkafka
+RUN apt-get update && apt-get install -y \
+    librdkafka-dev
+
+# Build and install libwandio (required by libbgpstream)
+RUN git clone https://github.com/LibtraceTeam/wandio.git /tmp/wandio && \
+    cd /tmp/wandio && \
+    ./bootstrap.sh && \
+    ./configure && \
+    make && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/wandio
+
+# Build and install libbgpstream
+RUN git clone https://github.com/CAIDA/libbgpstream.git /tmp/libbgpstream && \
+    cd /tmp/libbgpstream && \
+    ./autogen.sh && \
+    ./configure && \
+    make && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/libbgpstream
+
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+#RUN pip install --no-cache-dir -r requirements.ws.txt
+
+COPY backend/ .
+
+CMD ["uvicorn", "rislive_ws:app", "--host", "0.0.0.0", "--port", "8765"]
+
