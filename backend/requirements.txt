@@ -1,4 +1,8 @@
+requests
 fastapi
 uvicorn
 pybgpstream
 websockets
+httpx
+pandas
+

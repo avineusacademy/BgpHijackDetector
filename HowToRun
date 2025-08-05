@@ -12,3 +12,31 @@ To install in wsl
 wget https://github.com/vi/websocat/releases/download/v1.11.0/websocat.x86_64-unknown-linux-musl -O websocat
 chmod +x websocat
 sudo mv websocat /usr/local/bin/
+
+
+1. Use Known BGP Test Prefixes
+Some commonly seen prefixes used in research or routing labs:
+8.8.8.0/24 — Google Public DNS
+1.1.1.0/24 — Cloudflare DNS
+192.0.2.0/24, 198.51.100.0/24 — Documentation/test IPs (may not return real data)
+129.250.0.0/16 — NTT Communications
+140.82.112.0/20 — GitHub
+
+
+2. Use Active AS Numbers
+Try querying:
+AS15169 — Google
+AS13335 — Cloudflare
+AS32934 — Meta (Facebook)
+AS8075 — Microsoft
+AS174 — Cogent
+
+If your time window is from:
+
+From: 2025-08-04 22:00:00 UTC
+Until: 2025-08-04 23:00:00 UTC
+Try:
+Query: 8.8.8.0/24
+Or: 13335
+
+https://ris-live.ripe.net/

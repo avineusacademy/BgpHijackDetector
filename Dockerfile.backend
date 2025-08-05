@@ -2,49 +2,29 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install build tools and required libraries
 RUN apt-get update && apt-get install -y \
     gcc g++ make libtool autoconf automake pkg-config git \
-    libcurl4-openssl-dev libssl-dev zlib1g-dev \
-    wget ca-certificates python3-dev
+    libcurl4-openssl-dev libssl-dev zlib1g-dev wget ca-certificates python3-dev librdkafka-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-# --------------------------
-# Step 1: Build libwandio
-# --------------------------
+RUN apt-get update && apt install -y iputils-ping
 
-    # Install librdkafka
-RUN apt-get update && apt-get install -y \
-    librdkafka-dev
+RUN apt-get update && apt-get install -y procps
+
+
+# Install curl for healthcheck support
+RUN apt-get update && apt-get install -y curl && apt-get clean
 
 RUN git clone https://github.com/LibtraceTeam/wandio.git /tmp/wandio && \
-    cd /tmp/wandio && \
-    ./bootstrap.sh && \
-    ./configure && \
-    make && \
-    make install && \
-    ldconfig && \
-    rm -rf /tmp/wandio
-
-# --------------------------
-# Step 2: Build BGPStream
-# --------------------------
+    cd /tmp/wandio && ./bootstrap.sh && ./configure && make && make install && ldconfig && rm -rf /tmp/wandio
 
 RUN git clone https://github.com/CAIDA/libbgpstream.git /tmp/libbgpstream && \
-    cd /tmp/libbgpstream && \
-    ./autogen.sh && \
-    ./configure && \
-    make && \
-    make install && \
-    ldconfig && \
-    rm -rf /tmp/libbgpstream
+    cd /tmp/libbgpstream && ./autogen.sh && ./configure && make && make install && ldconfig && rm -rf /tmp/libbgpstream
 
-# --------------------------
-# Step 3: Python dependencies
-# --------------------------
+    
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the backend code
 COPY backend/ .
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

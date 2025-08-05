@@ -3,3 +3,7 @@ pandas
 requests
 websockets
 streamlit-autorefresh
+matplotlib
+networkx
+matplotlib 
+pyvis
